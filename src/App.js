@@ -1,25 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+import { ApolloProvider } from "@apollo/client";
+import React from "react";
+import { client } from "./ApolloClient/client";
+import GraphQL from "./components/GraphQL";
 
-function App() {
+export var TOKEN =
+  "eyJraWQiOiJFWHNhcDBySGlSQm1PUzd3cGtrSXV0SGNnWExpZWpOS0pMZ0x5SjZSQnhrPSIsImFsZyI6IlJTMjU2In0.eyJjdXN0b206cGluY29kZSI6IjI5OTI5OSIsInN1YiI6IjFmM2M1NzNlLWU4NzEtNGFiNC05Y2Q0LTU4YmFiMThmZDE2NiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhZGRyZXNzIjp7ImZvcm1hdHRlZCI6Ikh5ZCJ9LCJjdXN0b206Y29nbml0b2lkZW50aXR5aWQiOiJhcC1zb3V0aC0xOmJjMjg1MzIyLTc0NmMtNDdmMS1iMzA5LTZhNjA4MjUxMmE3MSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfSkpvY09RSlVFIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjpmYWxzZSwiY29nbml0bzp1c2VybmFtZSI6ImFwcHRlc3RmaXJld2lyZXNAZ21haWwuY29tIiwiY3VzdG9tOnBhcnRuZXIiOiJGaXJld2lyZXMiLCJhdWQiOiI1YjE1YnM1MnBucWlkNGJ0ZGNvaXM0Nmc3IiwiZXZlbnRfaWQiOiJjZTg2ODc5Yi1mODY3LTRhNDMtOWYwMy0wOWZjMzZmMzM0NjQiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1NTM2MDQzMiwibmFtZSI6IkFwcCBUZXN0IiwiY3VzdG9tOmF2YXRhckljb24iOiJZb3VuZ01hbjYiLCJwaG9uZV9udW1iZXIiOiIrOTE5ODg2ODMwNzc5IiwiY3VzdG9tOmlkZW50aXR5aWQiOiJhcC1zb3V0aC0xOmJjMjg1MzIyLTc0NmMtNDdmMS1iMzA5LTZhNjA4MjUxMmE3MSIsImV4cCI6MTY1NTM2NDAzMiwiaWF0IjoxNjU1MzYwNDMyLCJlbWFpbCI6ImFwcHRlc3RmaXJld2lyZXNAZ21haWwuY29tIn0.pmv8ppY8WzvE35obFJRhaDnOFjjaXX3cUN7ALmVbTLI_bbh8GmK3wt5NVdvUaQHZjYnr-msVwMJGB8goJXp_iXFhSWOvYsiGwMP6k6eUG8-BZfcGXBvtPQgL5urrvwukeTN8q-zpF3daeXnGzIo9zO4IUsQEAxSE9BVaPIlQbEDHl4SyNoSfnUhk0SwS9Em0LiiozsXoE_c-5CQ6_8dP4Xc3aN7Nb9OhcQerIJ7KaiR70f01OJJyfhzyeX7RpSVsfd2oFniJTXsvCx-xcZxrLSOeV7w8NdfQ6dKcDHkWHAzaoZH3IjVn8lSvu5lkSWrVSt0X1Zinu3JkCPTrVzpMQQ";
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ApolloProvider client={client}>
+      <GraphQL />
+    </ApolloProvider>
   );
-}
+};
 
 export default App;

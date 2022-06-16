@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useSubscription } from "@apollo/client";
 import React from "react";
 
 const TOKEN =
@@ -14,8 +14,19 @@ const ADD_TEST = gql`
   }
 `;
 
+const TEST_SUBSCRIPTION = gql`
+  subscription TestCreate {
+    testCreate {
+      recordId
+    }
+  }
+`;
+
 const GraphQL = () => {
   const [addTodo, { data, loading, error }] = useMutation(ADD_TEST);
+  const { data: subData, loading: subLoading } =
+    useSubscription(TEST_SUBSCRIPTION);
+
   const hadleAddTodo = () => {
     try {
       addTodo({
@@ -30,7 +41,7 @@ const GraphQL = () => {
       console.log(error.response.data);
     }
   };
-  console.log({ data, loading, error });
+  console.log({ data, subData });
   return (
     <div>
       <button onClick={() => hadleAddTodo()}>click me</button>

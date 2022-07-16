@@ -4,9 +4,11 @@ import React, { useEffect } from "react";
 import { TOKEN } from "../App";
 
 const TEST_SUBSCRIPTION = gql`
-  subscription TestCreate {
-    testCreate {
-      recordId
+  subscription OnContactSensorUpdate {
+    onContactSensorUpdate {
+      record {
+        deviceFriendlyName
+      }
     }
   }
 `;
@@ -20,8 +22,8 @@ const URL = dev
 export const QUERY_URL = `http://${URL}`;
 export const WSS_URL = `ws://${URL}`;
 
-export const FourCHSwitchBoardUpdateOne = `mutation FourCHSwitchBoardUpdateOne($record: UpdateOnefourCHSwitchBoardInput!, $filter: FilterUpdateOnefourCHSwitchBoardInput) {
-  fourCHSwitchBoardUpdateOne(record: $record, filter: $filter) {
+export const FourCHSwitchBoardUpdateOne = `mutation ContactSensorUpdateOne($record: UpdateOnecontactSensorInput!, $filter: FilterUpdateOnecontactSensorInput) {
+  contactSensorUpdateOne(record: $record, filter: $filter) {
     recordId
   }
 }`;
@@ -65,6 +67,14 @@ const rescord2 = {
   switch_4_Type: "Tv",
 };
 
+const record3 = {
+  deviceName: "test1ss45",
+  deviceFriendlyName: "1",
+  category: "contactSensor",
+  partner: "hello",
+  owner: "apptestfirewires@gmail.com",
+};
+
 const requestWithGraphql = async (query, variables = {}) => {
   try {
     const data = await axios.post(
@@ -87,20 +97,16 @@ const GraphQL = () => {
   console.log({ data, loading });
   const hadleAddTodo = async () => {
     try {
-      // const data = await requestWithGraphql(FourCHSwitchBoardUpdateOne, {
-      //   filter: {
-      //     deviceName: record1.deviceName,
-      //   },
-      //   record: {
-      //     deviceName: "test",
-      //     ...record1,
-      //   },
-      // });
-      const data = await requestWithGraphql(ADD_TEST, {
+      const data = await requestWithGraphql(FourCHSwitchBoardUpdateOne, {
+        filter: {
+          deviceName: record3.deviceName,
+        },
         record: {
-          name: "supriyo -1",
+          ...record3,
+          deviceFriendlyName: "6",
         },
       });
+
       console.log(data);
     } catch (error) {
       console.log("error ");

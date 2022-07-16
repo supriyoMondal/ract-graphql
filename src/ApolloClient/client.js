@@ -10,16 +10,22 @@ import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { setContext } from "@apollo/client/link/context";
 import { TOKEN } from "../App";
+import { QUERY_URL, WSS_URL } from "../components/GraphQL";
 
 const httpLink = new HttpLink({
-  uri: "http://localhost:8005/graphql",
+  uri: QUERY_URL,
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://localhost:8005/graphql",
+    url: WSS_URL,
     connectionParams: {
-      authToken: TOKEN,
+      headers: {
+        authorization: `${TOKEN}`,
+      },
+    },
+    onNonLazyError: (error) => {
+      console.log({ error });
     },
   })
 );

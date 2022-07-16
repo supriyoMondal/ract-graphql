@@ -1,18 +1,7 @@
 import { gql, useMutation, useSubscription } from "@apollo/client";
-import React from "react";
-
-const TOKEN =
-  "eyJraWQiOiJFWHNhcDBySGlSQm1PUzd3cGtrSXV0SGNnWExpZWpOS0pMZ0x5SjZSQnhrPSIsImFsZyI6IlJTMjU2In0.eyJjdXN0b206cGluY29kZSI6IjI5OTI5OSIsInN1YiI6IjFmM2M1NzNlLWU4NzEtNGFiNC05Y2Q0LTU4YmFiMThmZDE2NiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhZGRyZXNzIjp7ImZvcm1hdHRlZCI6Ikh5ZCJ9LCJjdXN0b206Y29nbml0b2lkZW50aXR5aWQiOiJhcC1zb3V0aC0xOmJjMjg1MzIyLTc0NmMtNDdmMS1iMzA5LTZhNjA4MjUxMmE3MSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfSkpvY09RSlVFIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjpmYWxzZSwiY29nbml0bzp1c2VybmFtZSI6ImFwcHRlc3RmaXJld2lyZXNAZ21haWwuY29tIiwiY3VzdG9tOnBhcnRuZXIiOiJGaXJld2lyZXMiLCJhdWQiOiI1YjE1YnM1MnBucWlkNGJ0ZGNvaXM0Nmc3IiwiZXZlbnRfaWQiOiI5NjllNGM2OS1kNDkyLTRkNjgtOGRmNC0zNzBhMmQ5NGM1OTYiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTY1NDYwNzQ2OCwibmFtZSI6IkFwcCBUZXN0IiwiY3VzdG9tOmF2YXRhckljb24iOiJZb3VuZ01hbjYiLCJwaG9uZV9udW1iZXIiOiIrOTE5ODg2ODMwNzc5IiwiY3VzdG9tOmlkZW50aXR5aWQiOiJhcC1zb3V0aC0xOmJjMjg1MzIyLTc0NmMtNDdmMS1iMzA5LTZhNjA4MjUxMmE3MSIsImV4cCI6MTY1NDYxMTA3NiwiaWF0IjoxNjU0NjA3NDc2LCJlbWFpbCI6ImFwcHRlc3RmaXJld2lyZXNAZ21haWwuY29tIn0.cF7hRFOKfuHXibk6CKh_IM2uX2-1_gsq29mvFzoo56ZK4U4osGjG_D8iyRHI7d7x30oP1ONH19nscCmqcaJjJePLDaljQmN-iZRcgaNDCBCb7wL63lTXrXSKKW0xqq-TJwAQWtBoj1POofi6KdDGoHJIF2J6o604LAJ3hIg4ZJs-O1eH4faAB8_QT3vUcp10yn6DgIfKZTAksLydrQb6QlkNKbUzW8VJOU4kFVL3ZXaEiZJ_i0_oJPgcQ6ioPyEIjaNF1yOFrfLx-6DaQO_LpQqcHTOW6_tY5Nrj3fefwwVAcl1q5BaqruHzkw017CdYGu8zfoSEJK__zwpc3qtfzA";
-
-const ADD_TEST = gql`
-  mutation TestCreate($record: CreateOnetestInput!) {
-    testCreate(record: $record) {
-      record {
-        name
-      }
-    }
-  }
-`;
+import axios from "axios";
+import React, { useEffect } from "react";
+import { TOKEN } from "../App";
 
 const TEST_SUBSCRIPTION = gql`
   subscription TestCreate {
@@ -22,26 +11,114 @@ const TEST_SUBSCRIPTION = gql`
   }
 `;
 
-const GraphQL = () => {
-  const [addTodo, { data, loading, error }] = useMutation(ADD_TEST);
-  const { data: subData, loading: subLoading } =
-    useSubscription(TEST_SUBSCRIPTION);
+const dev = true;
 
-  const hadleAddTodo = () => {
+const URL = dev
+  ? "localhost:8005/graphql"
+  : "graphql-dev.firewires.net/graphql";
+
+export const QUERY_URL = `http://${URL}`;
+export const WSS_URL = `ws://${URL}`;
+
+export const FourCHSwitchBoardUpdateOne = `mutation FourCHSwitchBoardUpdateOne($record: UpdateOnefourCHSwitchBoardInput!, $filter: FilterUpdateOnefourCHSwitchBoardInput) {
+  fourCHSwitchBoardUpdateOne(record: $record, filter: $filter) {
+    recordId
+  }
+}`;
+
+const ADD_TEST = `
+  mutation TestCreate($record: CreateOnetestInput!) {
+    testCreate(record: $record) {
+      record {
+        name
+      }
+    }
+  }
+`;
+
+const record1 = {
+  deviceFriendlyName: "4CH-47C",
+  deviceName: "FW_58BF259A647C",
+  roomName: "BedRoom_II",
+  switch_1: "Fan 47",
+  switch_1_Type: "FAN",
+  switch_2: "Lamp 47",
+  switch_2_Type: "Bulb",
+  switch_3: "Bulb 47",
+  switch_3_Type: "NightLamp",
+  switch_4: "Socket 47",
+  switch_4_Type: "FAN",
+  owner: "apptestfirewires@gmail.com",
+};
+
+const rescord2 = {
+  deviceFriendlyName: "4CH-AA0",
+  deviceName: "FW_30AEA412EAA0",
+  roomName: "BedRoom_I",
+  switch_1: "Lamp4",
+  switch_1_Type: "Bulb",
+  switch_2: "Tube4",
+  switch_2_Type: "Tube",
+  switch_3: "Fridge4",
+  switch_3_Type: "Fridge",
+  switch_4: "Tv6",
+  switch_4_Type: "Tv",
+};
+
+const requestWithGraphql = async (query, variables = {}) => {
+  try {
+    const data = await axios.post(
+      QUERY_URL,
+      { query, variables },
+      {
+        headers: {
+          Authorization: TOKEN,
+        },
+      }
+    );
+    return data;
+  } catch (error) {
+    return error.response.data || error.message;
+  }
+};
+
+const GraphQL = () => {
+  const { data, loading } = useSubscription(TEST_SUBSCRIPTION);
+  console.log({ data, loading });
+  const hadleAddTodo = async () => {
     try {
-      addTodo({
-        variables: {
-          record: {
-            name: "supriyo -1",
-          },
+      // const data = await requestWithGraphql(FourCHSwitchBoardUpdateOne, {
+      //   filter: {
+      //     deviceName: record1.deviceName,
+      //   },
+      //   record: {
+      //     deviceName: "test",
+      //     ...record1,
+      //   },
+      // });
+      const data = await requestWithGraphql(ADD_TEST, {
+        record: {
+          name: "supriyo -1",
         },
       });
+      console.log(data);
     } catch (error) {
       console.log("error ");
       console.log(error.response.data);
     }
   };
-  console.log({ data, subData });
+
+  const onload = async () => {
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    onload();
+  }, []);
+
   return (
     <div>
       <button onClick={() => hadleAddTodo()}>click me</button>

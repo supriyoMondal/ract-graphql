@@ -1,14 +1,12 @@
 import { gql, useMutation, useSubscription } from "@apollo/client";
 import axios from "axios";
 import React, { useEffect } from "react";
-import { TOKEN } from "../App";
+import { createClient } from "graphql-ws";
 
 const TEST_SUBSCRIPTION = gql`
-  subscription OnContactSensorUpdate {
-    onContactSensorUpdate {
-      record {
-        deviceFriendlyName
-      }
+  subscription Subscription($email: String!) {
+    onContactSensorUpdate(email: $email) {
+      recordId
     }
   }
 `;
@@ -39,8 +37,8 @@ const ADD_TEST = `
 `;
 
 const record1 = {
-  deviceFriendlyName: "4CH-47C",
   deviceName: "FW_58BF259A647C",
+  deviceFriendlyName: "4CH-47C",
   roomName: "BedRoom_II",
   switch_1: "Fan 47",
   switch_1_Type: "FAN",
@@ -50,7 +48,6 @@ const record1 = {
   switch_3_Type: "NightLamp",
   switch_4: "Socket 47",
   switch_4_Type: "FAN",
-  owner: "apptestfirewires@gmail.com",
 };
 
 const rescord2 = {
@@ -75,26 +72,34 @@ const record3 = {
   owner: "apptestfirewires@gmail.com",
 };
 
-const requestWithGraphql = async (query, variables = {}) => {
-  try {
-    const data = await axios.post(
-      QUERY_URL,
-      { query, variables },
-      {
-        headers: {
-          Authorization: TOKEN,
-        },
-      }
-    );
-    return data;
-  } catch (error) {
-    return error.response.data || error.message;
-  }
-};
-
-const GraphQL = () => {
-  const { data, loading } = useSubscription(TEST_SUBSCRIPTION);
-  console.log({ data, loading });
+const GraphQL = ({ token, email }) => {
+  // const subData = useSubscription(TEST_SUBSCRIPTION, {
+  //   variables: { postId: 100 },
+  // });
+  const requestWithGraphql = async (query, variables = {}) => {
+    try {
+      const data = await axios.post(
+        QUERY_URL,
+        { query, variables },
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      return error.response.data || error.message;
+    }
+  };
+  const client = createClient({
+    url: WSS_URL,
+    connectionParams: {
+      headers: {
+        authorization: `${token}`,
+      },
+    },
+  });
   const hadleAddTodo = async () => {
     try {
       const data = await requestWithGraphql(FourCHSwitchBoardUpdateOne, {
@@ -102,8 +107,8 @@ const GraphQL = () => {
           deviceName: record3.deviceName,
         },
         record: {
+          deviceFriendlyName: "test",
           ...record3,
-          deviceFriendlyName: "6",
         },
       });
 
@@ -114,15 +119,44 @@ const GraphQL = () => {
     }
   };
 
-  const onload = async () => {
-    try {
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    onload();
+    const unsubscribe = client.subscribe(
+      {
+        query: `subscription Subscription($email: String!) {
+          onContactSensorUpdate(email: $email) {
+            record {
+              deviceName
+              appStyle
+              category
+              partner
+              roomName
+              createdAt
+              deviceType
+              deviceFriendlyName
+              owner
+              members
+              inventoryID
+              updatedAt
+              hubID
+            }
+          }
+        }`,
+        variables: { email },
+      },
+      {
+        next: (data) => {
+          console.log({ data });
+        },
+        error: () => {},
+        complete: (all) => {
+          console.log({ all });
+          return () => {};
+        },
+      }
+    );
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
